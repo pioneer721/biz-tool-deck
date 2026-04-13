@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chiliz Workflow Intelligence Proposal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0c0c0e;
+            --surface-color: #161618;
+            --surface-hover: #1e1e21;
+            --text-primary: #ffffff;
+            --text-secondary: #8b8b93;
+            --text-tertiary: #5c5c62;
+            --accent-red: #E12235;
+            --sexy-red: #FF1E3C;
+            --border-color: #232326;
+            --success-color: #2ecc71;
+            --font-main: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Navigation Arrows */
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(22, 22, 24, 0.6);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(8px);
+        }
+
+        .nav-btn:hover {
+            background: var(--surface-hover);
+            color: var(--text-primary);
+            border-color: var(--text-secondary);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        #prevBtn { left: 48px; }
+        #nextBtn { right: 48px; }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Presentation Container */
+        .presentation {
+            position: relative;
+            width: 100%;
+            max-width: 1320px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Slides */
+        .slide {
+            position: absolute;
+            width: 100%;
+            padding: 40px 120px;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.98) translateY(10px);
+            transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+                        transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+                        visibility 0.8s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1) translateY(0);
+        }
+
+        /* Typography */
+        .tagline {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent-red);
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: 64px;
+            font-weight: 700;
+            line-height: 1.05;
+            margin-bottom: 24px;
+            letter-spacing: -2px;
+        }
+
+        h2 {
+            font-family: var(--font-display);
+            font-size: 44px;
+            font-weight: 500;
+            margin-bottom: 48px;
+            letter-spacing: -1px;
+        }
+
+        p.lead {
+            font-size: 22px;
+            color: var(--text-secondary);
+            max-width: 760px;
+            line-height: 1.5;
+            font-weight: 300;
+        }
+
+        /* Visual Flow Architecture Components */
+        .diagram-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            width: 100%;
+        }
+
+        .node {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 28px;
+            min-width: 240px;
+            position: relative;
+        }
+
+        .node-header {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-primary);
+        }
+
+        .node-body {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            font-weight: 400;
+        }
+
+        .badge {
+            font-size: 11px;
+            padding: 6px 10px;
+            background: rgba(225, 34, 53, 0.1);
+            color: var(--accent-red);
+            border-radius: 6px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .agent-node {
+            border-color: rgba(225, 34, 53, 0.4);
+            box-shadow: 0 0 60px rgba(225, 34, 53, 0.05);
+            background: linear-gradient(180deg, var(--surface-color) 0%, #111113 100%);
+        }
+
+        /* Arrows for Flowcharts */
+        .flow-arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-tertiary);
+            font-size: 13px;
+            gap: 10px;
+            font-weight: 500;
+        }
+        
+        .flow-arrow svg {
+            width: 48px;
+            height: 24px;
+            stroke: var(--text-tertiary);
+        }
+
+        /* Branching Layout */
+        .branch {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .branch-connector {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .branch-path {
+            width: 48px;
+            height: 120px;
+            border-left: 2px dashed var(--border-color);
+            border-top: 2px dashed var(--border-color);
+            border-bottom: 2px dashed var(--border-color);
+            border-radius: 12px 0 0 12px;
+            margin-right: -2px;
+        }
+
+        /* SaaSpocalypse Layout */
+        .saas-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 900px;
+            margin-top: 10px;
+        }
+
+        .saas-card {
+            display: flex;
+            align-items: center;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+            gap: 32px;
+        }
+
+        .saas-icon-wrap {
+            flex-shrink: 0;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(225, 34, 53, 0.05);
+            border: 1px solid rgba(225, 34, 53, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-red);
+        }
+
+        .saas-icon-wrap svg {
+            width: 28px;
+            height: 28px;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        /* Split Layouts */
+        .split-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .process-list {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .process-list .node {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 24px;
+        }
+
+        .step-number {
+            font-family: var(--font-display);
+            font-size: 28px;
+            color: var(--accent-red);
+            font-weight: 300;
+            min-width: 40px;
+            line-height: 1;
+        }
+
+        /* Vision Glass Presentation Container */
+        .visual-display-column {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .vision-glass-container {
+            width: 100%;
+            height: 440px;
+            background: #000000;
+            border-radius: 24px;
+            position: relative;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.9), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: radial-gradient(circle at top right, #111 0%, #000 100%);
+        }
+
+        .opt-2-glass {
+            width: 320px;
+            height: 380px;
+            border-radius: 20px;
+            background: rgba(20, 20, 22, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 30px 60px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .opt-2-red-flare {
+            position: absolute;
+            top: -50px;
+            left: -50px;
+            width: 150px;
+            height: 150px;
+            background: var(--sexy-red);
+            filter: blur(60px);
+            opacity: 0.5;
+        }
+
+        .opt-2-kf {
+            font-size: 12px;
+            letter-spacing: 4px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            z-index: 1;
+        }
+
+        .opt-2-v3 {
+            font-family: var(--font-display);
+            font-size: 110px;
+            font-weight: 500;
+            letter-spacing: -6px;
+            margin-top: auto;
+            margin-bottom: 20px;
+            z-index: 1;
+            background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.3) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .opt-2-date {
+            font-family: var(--font-display);
+            font-size: 14px;
+            color: var(--sexy-red);
+            letter-spacing: 2px;
+            z-index: 1;
+        }
+
+        .visual-note {
+            width: 100%;
+            padding-left: 20px;
+            border-left: 2px solid var(--sexy-red);
+        }
+
+        .visual-note p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        /* Localization Slide Specific Components */
+        .loc-tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            width: 100%;
+        }
+
+        .regional-stack {
+            display: flex;
+            gap: 16px;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .regional-stack .node {
+            min-width: unset;
+            flex: 1;
+            text-align: center;
+            padding: 16px;
+        }
+
+        .translation-mockup {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            width: 100%;
+        }
+
+        .loc-tweet {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tweet-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2a2a2f 0%, #111 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .avatar.red {
+            background: linear-gradient(135deg, var(--sexy-red) 0%, #3a0008 100%);
+        }
+
+        .tweet-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .verified-badge {
+            width: 14px;
+            height: 14px;
+            fill: var(--sexy-red);
+        }
+
+        .tweet-handle {
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 400;
+        }
+
+        .tweet-text {
+            font-size: 14px;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .mini-glass {
+            width: 100%;
+            height: 120px;
+            border-radius: 12px;
+            background: rgba(20, 20, 22, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            background: radial-gradient(circle at top right, #1a1a1c 0%, #000 100%);
+        }
+
+        .mini-glass-flare {
+            position: absolute;
+            top: -30px;
+            left: -30px;
+            width: 80px;
+            height: 80px;
+            background: var(--sexy-red);
+            filter: blur(30px);
+            opacity: 0.5;
+        }
+
+        .mini-v3 {
+            font-family: var(--font-display);
+            font-size: 48px;
+            font-weight: 500;
+            letter-spacing: -2px;
+            margin: auto 0 8px 0;
+            background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.3) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+
+        /* KOL Timeline */
+        .kol-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 48px;
+        }
+
+        .insight-box {
+            border-left: 4px solid var(--accent-red);
+            padding-left: 24px;
+            max-width: 800px;
+        }
+
+        .insight-box p {
+            font-size: 22px;
+            color: var(--text-primary);
+            line-height: 1.4;
+            font-weight: 300;
+            margin-bottom: 12px;
+        }
+
+        .insight-box span {
+            font-size: 16px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .timeline-flow {
+            display: flex;
+            align-items: center;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 40px;
+            justify-content: space-between;
+        }
+
+        .tl-point {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+            z-index: 2;
+            width: 140px;
+        }
+
+        .tl-dot {
+            width: 24px;
+            height: 24px;
+            background: var(--bg-color);
+            border: 4px solid var(--accent-red);
+            border-radius: 50%;
+        }
+
+        .tl-line {
+            height: 2px;
+            background: var(--border-color);
+            flex-grow: 1;
+            margin: 0 -40px;
+            position: relative;
+            top: -18px;
+            z-index: 1;
+        }
+
+        .tl-text {
+            text-align: center;
+            font-family: var(--font-display);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .tl-sub {
+            font-family: var(--font-main);
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        /* Dashboard Wireframe */
+        .dashboard-wireframe {
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            background: #111113;
+            width: 100%;
+            height: 440px;
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            overflow: hidden;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+        }
+
+        .db-sidebar {
+            background: var(--surface-color);
+            border-right: 1px solid var(--border-color);
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .db-nav-item { height: 36px; border-radius: 8px; background: var(--border-color); opacity: 0.4; width: 100%; }
+        .db-nav-item.active { opacity: 1; background: rgba(225, 34, 53, 0.1); border: 1px solid rgba(225, 34, 53, 0.3); }
+
+        .db-main { padding: 40px; display: flex; flex-direction: column; gap: 32px; }
+        .db-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .db-metric-card { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 10px; padding: 24px; }
+        .db-metric-val { font-size: 32px; font-weight: 600; font-family: var(--font-display); margin-top: 12px; color: var(--text-primary); }
+        .db-metric-lbl { font-size: 13px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+
+        .db-ai-bar {
+            margin-top: auto;
+            background: rgba(225, 34, 53, 0.05);
+            border: 1px solid rgba(225, 34, 53, 0.2);
+            border-radius: 12px;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .db-ai-bar svg { width: 24px; height: 24px; fill: var(--accent-red); flex-shrink: 0; }
+        .db-ai-text { font-size: 15px; color: var(--text-primary); font-family: var(--font-main); line-height: 1.4; }
+        .db-ai-sub { font-size: 13px; color: var(--text-tertiary); display: block; margin-top: 6px; }
+
+        /* Indicators and Counters */
+        .bottom-ui-container {
+            position: absolute;
+            bottom: 48px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 48px;
+            z-index: 100;
+        }
+
+        .slide-indicator {
+            display: flex;
+            gap: 12px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-tertiary);
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+
+        .dot.active {
+            background: var(--text-primary);
+            box-shadow: 0 0 12px rgba(255,255,255,0.3);
+            transform: scale(1.3);
+        }
+
+        .page-counter {
+            position: absolute;
+            right: 48px;
+            font-family: var(--font-display);
+            font-size: 15px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            letter-spacing: 2px;
+        }
+
+        .icon-small { width: 20px; height: 20px; fill: currentColor; }
+    </style>
+</head>
+<body>
+
+    <button id="prevBtn" class="nav-btn" aria-label="Previous Slide">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    
+    <button id="nextBtn" class="nav-btn" aria-label="Next Slide">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+
+    <div class="bottom-ui-container">
+        <div class="slide-indicator" id="indicators"></div>
+        <div class="page-counter" id="pageCounter">1 / 8</div>
+    </div>
+
+    <div class="presentation">
+
+        <!-- Slide 1: Intro -->
+        <div class="slide active">
+            <span class="tagline">Business Proposal</span>
+            <h1>Chiliz Workflow<br>Intelligence</h1>
+            <p class="lead">Integrating autonomous AI agents to seamlessly bridge product data community management and external growth operations.</p>
+        </div>
+
+        <!-- Slide 2: SaaSpocalypse -->
+        <div class="slide">
+            <span class="tagline">The Paradigm Shift</span>
+            <h2>SaaSpocalypse</h2>
+            
+            <div class="saas-grid">
+                <div class="saas-card">
+                    <div class="saas-icon-wrap">
+                        <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    </div>
+                    <div>
+                        <div class="node-header">The End of Bloat</div>
+                        <div class="node-body">Companies are actively reducing their reliance on expensive subscription models.</div>
+                    </div>
+                </div>
+
+                <div class="saas-card">
+                    <div class="saas-icon-wrap">
+                        <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    </div>
+                    <div>
+                        <div class="node-header">Bespoke Intelligence</div>
+                        <div class="node-body">It is now incredibly easy to build proprietary AI agents that cost a fraction to maintain and perfectly satisfy specific internal demands.</div>
+                    </div>
+                </div>
+
+                <div class="saas-card">
+                    <div class="saas-icon-wrap">
+                        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    </div>
+                    <div>
+                        <div class="node-header">Lean Operations</div>
+                        <div class="node-body">Teams are becoming smaller and highly efficient not just because AI writes code but because they are generating custom tools to autonomously streamline their workflows.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Community Manager -->
+        <div class="slide">
+            <span class="tagline">Agent 01</span>
+            <h2>Community Manager</h2>
+            
+            <div class="diagram-container">
+                <div class="node">
+                    <span class="badge">Input</span>
+                    <div class="node-header">Support Ticket</div>
+                    <div class="node-body">Incoming queries from external channels.</div>
+                </div>
+
+                <div class="flow-arrow">
+                    Inbound
+                    <svg viewBox="0 0 40 24" fill="none"><path d="M0 12h38M30 4l8 8-8 8" stroke-width="1.5"/></svg>
+                </div>
+
+                <div class="node agent-node">
+                    <span class="badge">AI Core</span>
+                    <div class="node-header">
+                        <svg class="icon-small" viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 16a6 6 0 110-12 6 6 0 010 12z"/></svg>
+                        Logic Engine
+                    </div>
+                    <div class="node-body">Reads the ticket against Kayen Finance internal data structures and roles. Determines confidence level.</div>
+                </div>
+
+                <div class="branch-connector">
+                    <div class="branch-path"></div>
+                </div>
+
+                <div class="branch">
+                    <div class="node" style="border-left: 4px solid var(--success-color);">
+                        <span class="badge" style="background: rgba(46, 204, 113, 0.1); color: var(--success-color);">High Confidence</span>
+                        <div class="node-header">Community Resolution</div>
+                        <div class="node-body">Directly answers and resolves the community query instantly.</div>
+                    </div>
+                    <div class="node" style="border-left: 4px solid #f1c40f;">
+                        <span class="badge" style="background: rgba(241, 196, 15, 0.1); color: #f1c40f;">Low Confidence</span>
+                        <div class="node-header">Escalation via Slack</div>
+                        <div class="node-body">Mentions specific domain experts in Slack with a summary and ticket link.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Community Analysis -->
+        <div class="slide">
+            <span class="tagline">Agent 02</span>
+            <h2>Community Analysis</h2>
+            
+            <div class="diagram-container" style="gap: 48px;">
+                <div class="branch" style="gap: 20px;">
+                    <div class="node">
+                        <div class="node-header">Discord Server</div>
+                        <div class="node-body">Support and technical chatter</div>
+                    </div>
+                    <div class="node">
+                        <div class="node-header">Telegram Group</div>
+                        <div class="node-body">Real time discussions</div>
+                    </div>
+                </div>
+
+                <div class="flow-arrow">
+                    <svg viewBox="0 0 40 24" fill="none"><path d="M0 12h38M30 4l8 8-8 8" stroke-width="1.5"/></svg>
+                </div>
+
+                <div class="node agent-node">
+                    <span class="badge">AI Core</span>
+                    <div class="node-header">Aggregation Engine</div>
+                    <div class="node-body">Analyzes sentiment extracts key themes and condenses thousands of messages seamlessly.</div>
+                </div>
+
+                <div class="flow-arrow">
+                    <svg viewBox="0 0 40 24" fill="none"><path d="M0 12h38M30 4l8 8-8 8" stroke-width="1.5"/></svg>
+                </div>
+
+                <div class="node">
+                    <span class="badge" style="background: rgba(255, 255, 255, 0.1); color: white;">Output</span>
+                    <div class="node-header">Weekly Executive Report</div>
+                    <div class="node-body">A high signal automated single page report delivered directly to the management team.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: X Manager -->
+        <div class="slide">
+            <span class="tagline">Agent 03</span>
+            <h2>X Manager Pipeline</h2>
+            
+            <div class="split-layout">
+                <!-- Process List -->
+                <div class="process-list">
+                    <div class="node">
+                        <div class="step-number">01</div>
+                        <div>
+                            <div class="node-header">Context Ingestion</div>
+                            <div class="node-body">Monitors relevant ecosystem accounts daily to identify emerging narratives.</div>
+                        </div>
+                    </div>
+                    <div class="node agent-node">
+                        <div class="step-number">02</div>
+                        <div>
+                            <div class="node-header">AI Copy and HTML Visuals</div>
+                            <div class="node-body">Autonomously writes three contextual drafts and generates a professional custom HTML graphic.</div>
+                        </div>
+                    </div>
+                    <div class="node">
+                        <div class="step-number">03</div>
+                        <div>
+                            <div class="node-header">Typefully Sync and Approval</div>
+                            <div class="node-body">Pushes text and the rendered code to Typefully for human selection editing and scheduling.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vision Glass HTML Visual Mockup -->
+                <div class="visual-display-column">
+                    <div class="vision-glass-container">
+                        <div class="opt-2-glass">
+                            <div class="opt-2-red-flare"></div>
+                            <div class="opt-2-kf">Kayen Finance</div>
+                            <div class="opt-2-v3">V3</div>
+                            <div class="opt-2-date">2026.06.XX</div>
+                        </div>
+                    </div>
+                    <div class="visual-note">
+                        <p>This visual was generated via a simple single sentence prompt using our dedicated design agent. It is pure HTML code rather than a static image making it infinitely editable and instantly translatable for global campaigns.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Localization Agent -->
+        <div class="slide">
+            <span class="tagline">Agent 04</span>
+            <h2>Localization Agent</h2>
+            <p class="lead" style="margin-bottom: 48px;">Instantly scale global reach. Because our visuals are rendered in pure code both text and graphical elements are automatically translated and published natively.</p>
+
+            <div class="split-layout" style="align-items: flex-start;">
+                
+                <!-- Left Column: Logic Flow -->
+                <div class="loc-tree">
+                    <div class="node" style="text-align: center; width: 100%;">
+                        <span class="badge" style="background: rgba(255,255,255,0.1); color: white;">Trigger</span>
+                        <div class="node-header" style="justify-content: center;">Global Account</div>
+                        <div class="node-body">Publishes new approved post.</div>
+                    </div>
+
+                    <div class="flow-arrow">
+                        <svg viewBox="0 0 40 24" fill="none"><path d="M20 0v24M12 16l8 8 8-8" stroke-width="1.5"/></svg>
+                    </div>
+
+                    <div class="node agent-node" style="text-align: center; width: 100%;">
+                        <span class="badge">AI Core</span>
+                        <div class="node-header" style="justify-content: center;">Translation Engine</div>
+                        <div class="node-body">Translates linguistic nuances and dynamically alters the HTML visual code to match the local language.</div>
+                    </div>
+
+                    <div class="flow-arrow">
+                        <svg viewBox="0 0 40 24" fill="none"><path d="M20 0v24M12 16l8 8 8-8" stroke-width="1.5"/></svg>
+                    </div>
+
+                    <div class="regional-stack">
+                        <div class="node" style="padding: 16px; border-top-color: #e74c3c;">
+                            <div class="node-header" style="margin: 0; font-size: 15px;">🇹🇷 Turkey</div>
+                        </div>
+                        <div class="node" style="padding: 16px; border-top-color: #3498db;">
+                            <div class="node-header" style="margin: 0; font-size: 15px;">🇰🇷 Korea</div>
+                        </div>
+                        <div class="node" style="padding: 16px; border-top-color: #f1c40f;">
+                            <div class="node-header" style="margin: 0; font-size: 15px;">🇪🇸 LatAm</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Visual Translation Mockups -->
+                <div class="translation-mockup">
+                    
+                    <!-- Original English Tweet -->
+                    <div class="loc-tweet">
+                        <div class="tweet-user">
+                            <div class="avatar"></div>
+                            <div class="tweet-name">
+                                Kayen Finance 
+                                <svg class="verified-badge" viewBox="0 0 24 24"><path d="M22.5 12.5l-1.5 1.5.5 2-2 .5-.5 2-2-.5-1.5 1.5-2-.5-2 .5-1.5-1.5-2 .5-.5-2-2-.5.5-2-1.5-1.5 1.5-1.5-.5-2 2-.5.5-2 2 .5 1.5-1.5 2 .5 2-.5 1.5 1.5 2-.5.5 2 2 .5-.5 2z"/></svg>
+                                <span class="tweet-handle">@KayenFinance</span>
+                            </div>
+                        </div>
+                        <div class="tweet-text">The next generation is here. Get ready.</div>
+                        <div class="mini-glass">
+                            <div class="mini-glass-flare"></div>
+                            <div style="font-size:10px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:2px; z-index:1;">Kayen Finance</div>
+                            <div class="mini-v3">V3</div>
+                            <div style="font-size:11px; color:var(--sexy-red); letter-spacing:1px; font-family:var(--font-display); z-index:1; font-weight:600;">LAUNCH</div>
+                        </div>
+                    </div>
+
+                    <!-- Translation Arrow -->
+                    <div class="flow-arrow">
+                        <svg viewBox="0 0 40 24" fill="none" style="stroke: var(--sexy-red);"><path d="M20 0v24M12 16l8 8 8-8" stroke-width="2"/></svg>
+                    </div>
+
+                    <!-- Translated Spanish Tweet -->
+                    <div class="loc-tweet" style="border-color: rgba(255, 30, 60, 0.4); box-shadow: 0 20px 60px rgba(255, 30, 60, 0.1);">
+                        <div class="tweet-user">
+                            <div class="avatar red"></div>
+                            <div class="tweet-name">
+                                Kayen LatAm 
+                                <svg class="verified-badge" viewBox="0 0 24 24"><path d="M22.5 12.5l-1.5 1.5.5 2-2 .5-.5 2-2-.5-1.5 1.5-2-.5-2 .5-1.5-1.5-2 .5-.5-2-2-.5.5-2-1.5-1.5 1.5-1.5-.5-2 2-.5.5-2 2 .5 1.5-1.5 2 .5 2-.5 1.5 1.5 2-.5.5 2 2 .5-.5 2z"/></svg>
+                                <span class="tweet-handle">@KayenLatAm</span>
+                            </div>
+                        </div>
+                        <div class="tweet-text">La próxima generación ya está aquí. Prepárate.</div>
+                        <div class="mini-glass">
+                            <div class="mini-glass-flare"></div>
+                            <div style="font-size:10px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:2px; z-index:1;">Kayen Finance</div>
+                            <div class="mini-v3">V3</div>
+                            <div style="font-size:11px; color:var(--sexy-red); letter-spacing:1px; font-family:var(--font-display); z-index:1; font-weight:600;">LANZAMIENTO</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: KOL Evaluator -->
+        <div class="slide">
+            <span class="tagline">Agent 05</span>
+            <h2>KOL Evaluator Agent</h2>
+            
+            <div class="kol-layout">
+                <div class="insight-box">
+                    <p>No matter how famous they are agency networks remain black boxes.</p>
+                    <span>We need custom built agents to track post compliance and strictly evaluate actual KPI performance.</span>
+                </div>
+
+                <div class="timeline-flow">
+                    <div class="tl-point">
+                        <div class="tl-text">KOL Contracted</div>
+                        <div class="tl-dot"></div>
+                        <div class="tl-sub">Target Mention</div>
+                    </div>
+                    <div class="tl-line"></div>
+                    <div class="tl-point">
+                        <div class="tl-text">Verification</div>
+                        <div class="tl-dot" style="border-color: var(--success-color);"></div>
+                        <div class="tl-sub">Did they post</div>
+                    </div>
+                    <div class="tl-line"></div>
+                    <div class="tl-point">
+                        <div class="tl-text">One Week Sync</div>
+                        <div class="tl-dot" style="border-color: #f1c40f;"></div>
+                        <div class="tl-sub">Token delta tracking</div>
+                    </div>
+                    <div class="tl-line"></div>
+                    <div class="tl-point">
+                        <div class="tl-text">One Month Sync</div>
+                        <div class="tl-dot" style="border-color: #f1c40f;"></div>
+                        <div class="tl-sub">Token delta tracking</div>
+                    </div>
+                    <div class="tl-line"></div>
+                    <div class="tl-point">
+                        <div class="tl-text">Evaluator Output</div>
+                        <div class="node agent-node" style="min-width: 140px; padding: 12px; margin-top: 8px;">
+                            <div class="node-header" style="font-size: 15px; margin: 0; justify-content: center;">ROI Report</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Dashboard -->
+        <div class="slide">
+            <span class="tagline">Convergence</span>
+            <h2>Unified Management Dashboard</h2>
+            <p class="lead" style="margin-bottom: 40px;">In the AI era splitting product and business is obsolete. This hub centralizes key indicators KOL performance and project tracking.</p>
+
+            <div class="dashboard-wireframe">
+                <div class="db-sidebar">
+                    <div class="db-nav-item active"></div>
+                    <div class="db-nav-item"></div>
+                    <div class="db-nav-item"></div>
+                </div>
+                <div class="db-main">
+                    <div class="node-header" style="font-size: 22px;">Business Overview</div>
+                    <div class="db-metrics">
+                        <div class="db-metric-card">
+                            <div class="db-metric-lbl">Total Followers</div>
+                            <div class="db-metric-val">2.4M <span style="color:var(--success-color); font-size:16px;">↑ 1.2%</span></div>
+                        </div>
+                        <div class="db-metric-card">
+                            <div class="db-metric-lbl">KOL ROI Index</div>
+                            <div class="db-metric-val">2.8x <span style="color:var(--success-color); font-size:16px;">↑ High</span></div>
+                        </div>
+                        <div class="db-metric-card">
+                            <div class="db-metric-lbl">Active Tickets</div>
+                            <div class="db-metric-val">12 <span style="color:var(--text-secondary); font-size:16px;">Stable</span></div>
+                        </div>
+                    </div>
+                    
+                    <div style="flex-grow: 1;"></div>
+
+                    <div class="db-ai-bar">
+                        <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+                        <div>
+                            <div class="db-ai-text"><strong>Ask AI:</strong> What is the difference between KayenFi v2 and v3</div>
+                            <span class="db-ai-sub">Agent links directly to documentation and tags specific engineers for follow up.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const indicatorsContainer = document.getElementById('indicators');
+            const pageCounter = document.getElementById('pageCounter');
+            let currentSlide = 0;
+
+            // Dynamically create indicators based on number of slides
+            slides.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                if (index === 0) dot.classList.add('active');
+                
+                // Allow clicking dots to navigate
+                dot.addEventListener('click', () => updateSlides(index));
+                
+                indicatorsContainer.appendChild(dot);
+            });
+
+            const dots = document.querySelectorAll('.dot');
+
+            function updateSlides(newIndex) {
+                // Bounds checking
+                if (newIndex < 0) newIndex = 0;
+                if (newIndex >= slides.length) newIndex = slides.length - 1;
+                
+                if (newIndex === currentSlide) return;
+
+                // Remove active class
+                slides[currentSlide].classList.remove('active');
+                dots[currentSlide].classList.remove('active');
+
+                // Update Index
+                currentSlide = newIndex;
+
+                // Add active class
+                slides[currentSlide].classList.add('active');
+                dots[currentSlide].classList.add('active');
+
+                // Update page counter
+                pageCounter.textContent = (currentSlide + 1) + ' / ' + slides.length;
+
+                // Button states
+                prevBtn.style.opacity = currentSlide === 0 ? '0.3' : '1';
+                prevBtn.style.pointerEvents = currentSlide === 0 ? 'none' : 'auto';
+                
+                nextBtn.style.opacity = currentSlide === slides.length - 1 ? '0.3' : '1';
+                nextBtn.style.pointerEvents = currentSlide === slides.length - 1 ? 'none' : 'auto';
+            }
+
+            // Initial button and counter state
+            prevBtn.style.opacity = '0.3';
+            prevBtn.style.pointerEvents = 'none';
+            pageCounter.textContent = '1 / ' + slides.length;
+
+            // Event Listeners for Buttons
+            prevBtn.addEventListener('click', () => updateSlides(currentSlide - 1));
+            nextBtn.addEventListener('click', () => updateSlides(currentSlide + 1));
+
+            // Keyboard Navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') updateSlides(currentSlide - 1);
+                if (e.key === 'ArrowRight') updateSlides(currentSlide + 1);
+            });
+        });
+    </script>
+</body>
+</html>
